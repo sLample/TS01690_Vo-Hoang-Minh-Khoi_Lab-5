@@ -6,12 +6,14 @@
     <input v-model="post.author" placeholder="Tác giả" />
     <textarea v-model="post.content" placeholder="Nội dung"></textarea>
 
-    <button @click="addPost">Đăng bài</button>
+    <p v-if="error" class="error">{{ error }}</p>
+
+    <button @click="submitPost">Đăng bài</button>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
 const emit = defineEmits(['add-post'])
 
@@ -21,51 +23,80 @@ const post = reactive({
   content: ''
 })
 
-const addPost = () => {
-  emit('add-post', { ...post })
+const error = ref('')
+
+const submitPost = () => {
+  if (!post.title || !post.author || !post.content) {
+    error.value = 'Vui lòng nhập đầy đủ thông tin'
+    return
+  }
+
+  emit('add-post', { ...post, id: Date.now() })
+
   post.title = ''
   post.author = ''
   post.content = ''
+  error.value = ''
 }
 </script>
 
 <style scoped>
 .create-post {
-  max-width: 500px;
-  margin: 0 auto 40px;
-  padding: 20px;
-  background: #1e1e1e;
-  border-radius: 10px;
+  width: 100%;
+  padding: 30px;
+  background: linear-gradient(180deg, #1f1f1f, #2a2a2a);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  color: #ffffff;
 }
 
 input,
 textarea {
   width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
   border: none;
-  background: #2c2c2c;
-  color: #fff;
+  background: #ffffff;
+  color: #000000;
+  font-size: 15px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #666;
 }
 
 textarea {
   resize: none;
-  height: 90px;
+  height: 120px;
 }
 
 button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background: #0dcaf0;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  color: #000;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #31d2f2;
+}
+
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  margin-bottom: 10px;
 }
 </style>
